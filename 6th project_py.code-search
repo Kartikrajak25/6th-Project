@@ -1,0 +1,50 @@
+# Query: 6th project.py
+# ContextLines: 1
+
+
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import classification_report, confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("business_reviews_full.csv")
+
+X = df['Review']
+y = df['Sentiment']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+
+model = Pipeline([
+    ('tfidf', TfidfVectorizer(stop_words='english')),
+    ('nb', MultinomialNB())
+])
+
+model.fit(X_train, y_train)
+
+# Step 6: Predict and evaluate
+y_pred = model.predict(X_test)
+
+print("📊 Classification Report:")
+print(classification_report(y_test, y_pred))
+
+print("🔍 Confusion Matrix:")
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, cmap="YlGnBu", xticklabels=model.classes_, yticklabels=model.classes_)
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Sentiment Classification Confusion Matrix")
+plt.show()
+
+def predict_sentiment(text):
+    sentiment = model.predict([text])[0]
+    print(f"Review: \"{text}\"\nPredicted Sentiment: {sentiment}")
+
+# Test the function
+predict_sentiment("The food was absolutely delicious and the service was perfect.")
+predict_sentiment("Too noisy and the service was terrible.")
+predict_sentiment("It was okay, nothing impressive.")ults
